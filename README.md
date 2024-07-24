@@ -1,4 +1,4 @@
-# Web Scraper with Generation AI
+# Banking Rate Web Scraper with Generative AI
 
 This repo implements a web scraping tool to extract publicly available banking rate information from a collection of bank websites.
 
