@@ -5,14 +5,14 @@ This repo implements a web scraping tool to extract publicly available banking r
 ## Implementation Roadmap
 
 - [x] The web scraper BeautifulSoup is used to scrape HTML tags from a list of websites.
-- [x] From the collected tags, we filter for `<table>` tags, discarding the rest.
-- [x] These tables are converted into CSV to clean them up and reduce their character count.
-- [x] Next the tables are converted in CSV format using custom functions.
+- [x] From the collected tags, we filter for `<table>`, `<h1>`, and `<h2>` tags, discarding the rest.
+- [x] These tables are converted into CSV to clean them up and reduce their character count using custom functions.  
 - [x] The CSV tables are then chunked to prepare them for sending to a large language model (LLM).
 - [x] Along with the table chunks, a JSON schema is provided to the LLM to instruct it on how the data should be formatted in it's response.
 - [x] Special instructions can be provided to the LLM to handle edge cases or other behavior not well defined in the JSON schema.
 - [x] Once the LLM receives the table chunks, JSON schema, and special instructions, it responds with a list of JSON objects containing the banking rates, per the schema.
-- [ ] After all JSON objects are returned from the LLM, a post-processing script aggregates and deduplicates the data.
+- [x] After all JSON objects are returned from the LLM, a post-processing script aggregates and deduplicates the data.
+- [ ] A validation step ensures that output from the LLM accuratley reflects the real bank rates (hallucination detection)  
 - [ ] The JSON object are then stored in FileMaker
 
 ## JSON Schema
