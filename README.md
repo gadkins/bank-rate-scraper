@@ -372,7 +372,25 @@ We will create a human-in-the-loop evaluation pipeline to reduce the likelihood 
 
 ## Usage
 
-To run the web scraper, execute the following commands:
+To run the application, follow these steps:
+
+### Clone the repository
+
+```bash
+git clone https://github.com/gadkins/bank-rate-scraper.git
+```
+
+### Configure the environment
+
+Rename the `.env.example` file to `.env`:  
+
+```bash
+cp .env.example .env
+```
+
+Replace `OPENAI_API_KEY=your-api-key` with your API key from OpenAI (Get your API key [here](https://platform.openai.com/api-keys)).:  
+
+### Create a virtual environment
 
 ```bash
 # Create a virtual environment
@@ -380,10 +398,15 @@ python3 -m venv myenv
 
 # Activate a virtual environment
 source myenv/bin/activate
+```
+### Install dependencies
 
+```bash
 # Now you can install packages in an isolated venv, e.g...
 pip3 install -r requirements.txt
 ```
+
+### Run the script
 
 Then run the following command:
 
