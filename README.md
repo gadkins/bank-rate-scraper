@@ -8,16 +8,20 @@ This repo implements a web scraping tool to extract publicly available banking r
 - [x] From the collected tags, we filter for `<table>`, `<h1>`, and `<h2>` tags, discarding the rest.
 - [x] These tables are converted into CSV to clean them up and reduce their character count using custom functions.  
 - [x] The CSV tables are then chunked to prepare them for sending to a large language model (LLM).
-- [x] Along with the table chunks, a JSON schema is provided to the LLM to instruct it on how the data should be formatted in it's response.
-- [x] Special instructions can be provided to the LLM to handle edge cases or other behavior not well defined in the JSON schema.
-- [x] Once the LLM receives the table chunks, JSON schema, and special instructions, it responds with a list of JSON objects containing the banking rates, per the schema.
+- [x] Along with the table chunks, a structured schema (Pydantic object) is provided to the LLM to instruct it on how the data should be formatted in it's response.
+- [x] Special instructions can be provided to the LLM to handle edge cases or other behavior not well defined in the Pydantic object schema.
+- [x] Once the LLM receives the table chunks, structured schema response format, and special instructions, it responds with a list of JSON objects containing the banking rates, per the schema (OpenAI Python SDK now supports enfocing a `response_format` such as a Pydantic object. The SDK handles converting the data type to a supported JSON schema, deserializing the JSON response into the typed data structure automatically, and parsing refusals if they arise. See [OpenAI Structured Outputs](https://platform.openai.com/docs/guides/structured-outputs)).
 - [x] After all JSON objects are returned from the LLM, a post-processing script aggregates and deduplicates the data.
-- [ ] A validation step ensures that output from the LLM accuratley reflects the real bank rates (hallucination detection)  
-- [ ] The JSON object are then stored in FileMaker
+- [ ] A post-processing [validation pipeline](#output-validation) is used to check that the LLM outputs are accurate.  
+- [ ] The validated data is then stored in a database (likely NoSQL) for use in downstream tasks
+- [ ] An API is created to serve the data
 
-## JSON Schema
+## Structured Output
 
-The following JSON schema is provided to the LLM to format it's response:  
+We expect the LLM to respond with the following structured output (in JSON format):   
+
+<details>
+  <summary>Show JSON schema</summary>
 
 ```json
 {
@@ -346,4 +350,43 @@ The following JSON schema is provided to the LLM to format it's response:
         }
     }
 }
+```
+</details>
+
+## Output Validation
+
+We will create a human-in-the-loop evaluation pipeline to reduce the likelihood of errors, We'll use the following steps to validate the output of the LLM:
+
+### 1. Rules-based Evaluation  
+- Create a set of heuristics and rules to sanity check the model's output. E.g. if a field was previously not empty, it should be non-empty again.  
+- We can use `deepdiff` to compare current and former JSON object states to determine what changed from last state  
+
+### 2. Model-graded Evaluation  
+- Ask an advanced LLM (like GPT-4o) to grade the output of the other model. This step can be broken down into a multi-agent pipeline, where one agent checks format and the other checks values.  
+- Reprompt the model to correct any errors or omissions  
+- Flag any entries that are below a certain confidence threshold for human evaluation
+
+### 3. Human Evaluation  
+- After rules-based and model-graded evaluation, send flagged entries to a human for evaluation  
+- The human evaluator will then enter data manually into the FileMaker database
+
+## Usage
+
+To run the web scraper, execute the following commands:
+
+```bash
+# Create a virtual environment
+python3 -m venv myenv
+
+# Activate a virtual environment
+source myenv/bin/activate
+
+# Now you can install packages in an isolated venv, e.g...
+pip3 install -r requirements.txt
+```
+
+Then run the following command:
+
+```python
+python3 main.py
 ```
