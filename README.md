@@ -388,7 +388,7 @@ Rename the `.env.example` file to `.env`:
 cp .env.example .env
 ```
 
-Replace `OPENAI_API_KEY=your-api-key` with your API key from OpenAI (Get your API key [here](https://platform.openai.com/api-keys)).:  
+In the `.env` file you create, replace `OPENAI_API_KEY=your-api-key` with your API key from OpenAI (Get your API key [here](https://platform.openai.com/api-keys)).   
 
 ### Create a virtual environment
 
